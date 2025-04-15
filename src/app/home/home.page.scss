@@ -1,27 +1,80 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.page-wrapper {
+  background: #f9f9f9;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-left: 200px;
+  padding-right: 200px;
 }
 
-#container strong {
+ion-content {
+  --padding-bottom: 20px;
+  background: #f2f2f2;
+}
+
+.input-section {
+  padding-top: 20px;
+}
+
+.city-name {
+  margin-bottom: 20px !important;
+}
+
+.input-field {
+  flex: 1;
+}
+
+ion-item {
+  margin-bottom: 16px;
+  --background: #fff;
+}
+
+ion-button {
+  margin-top: 10px;
+  border-radius: 20px;
+}
+
+ion-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+ion-card-title {
   font-size: 20px;
-  line-height: 26px;
+  font-weight: 600;
+  color: #1e1e1e;
 }
 
-#container p {
+ion-card-content p {
+  margin: 6px 0;
   font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+  color: #333;
 }
 
-#container a {
-  text-decoration: none;
+.forecast-wrapper {
+  margin: 20px;
+}
+
+.forecast-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.forecast-day {
+  flex: 1;
+  min-width: 110px;
+  text-align: center;
+  background: #fefefe;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.forecast-icon {
+  width: 50px;
+  height: 50px;
 }
