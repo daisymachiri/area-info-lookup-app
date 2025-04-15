@@ -7,7 +7,9 @@ export const routes: Routes = [
   },
   {
     path: '',
+       /* @vite-ignore */
     redirectTo: 'home',
     pathMatch: 'full',
   },
 ];
+

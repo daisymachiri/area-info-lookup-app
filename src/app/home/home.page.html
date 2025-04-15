@@ -1,20 +1,62 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<div class="page-wrapper">
+  <ion-toolbar color="primary">
+    <ion-title>Weather Lookup</ion-title>
   </ion-toolbar>
-</ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-content>
+    <div class="content-wrapper" style="display: flex; flex-direction: row; gap: 1rem; padding: 1rem;">
+    
+      <!-- Weather Card -->
+      <div *ngIf="weather" style="flex: 1;">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{ weather.name }} - {{ weather.sys.country }}</ion-card-title>
+            <p>{{ getFormattedDate() }}</p> <!-- current date with day -->
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Temperature:</strong> {{ weather.main.temp }}°C</p>
+            <p><strong>Humidity:</strong> {{ weather.main.humidity }}%</p>
+            <img *ngIf="weather?.weather?.[0]?.icon"
+              [src]="'https://openweathermap.org/img/wn/' + weather.weather[0].icon + '@2x.png'"
+              alt="Weather Icon"
+              class="weather-icon">
+            <p><strong>Condition:</strong> {{ weather.weather[0].description }}</p>
+            <p><strong>Wind Speed:</strong> {{ weather.wind.speed }} m/s</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
-</ion-content>
+      <!-- Input Form -->
+      <div class="input-section" style="flex: 1;">
+        <ion-label class="city-name" position="floating" style="padding-bottom: 20px;">Enter A City Name</ion-label>
+        <ion-item class="input-field">
+          <ion-input [(ngModel)]="city" placeholder="E.g., Johannesburg" clearInput></ion-input>
+        </ion-item>
+        <ion-button expand="block" (click)="fetchWeather()">Get Weather</ion-button>
+        <div style="text-align: center; margin-top: 10px;">Or</div>
+        <ion-button expand="block" (click)="getCurrentLocation()">Use Current Location</ion-button>
+      </div>
+
+    </div>
+
+    <!-- Forecast Card -->
+    <div *ngIf="forecast.length > 0" class="forecast-wrapper">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>5-Day Weather Projection</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="forecast-grid">
+            <div *ngFor="let day of forecast" class="forecast-day">
+              <p><strong>{{ day.date | date:'EEE' }}</strong></p>
+              <img [src]="'https://openweathermap.org/img/wn/' + day.icon + '@2x.png'" alt="icon" class="forecast-icon" />
+              <p>Temp: {{ day.temp }}°C</p>
+              <p>Wind: {{ day.wind }} m/s</p>
+              <p>Humidity: {{ day.humidity }}%</p>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </ion-content>
+</div>
