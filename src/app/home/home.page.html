@@ -22,6 +22,14 @@
               class="weather-icon">
             <p><strong>Condition:</strong> {{ weather.weather[0].description }}</p>
             <p><strong>Wind Speed:</strong> {{ weather.wind.speed }} m/s</p>
+
+            <!-- Heart Icon Button for Add/Remove from Favorites -->
+            <ion-button (click)="toggleFavorite()" fill="clear" class="favorite-btn">
+              <i class="fa-regular fa-heart heart-icon" [ngClass]="isFavorite() ? 'favorite' : 'not-favorite'"></i>
+              <span class="favorite-text" [ngClass]="isFavorite() ? 'favorite' : 'not-favorite'">
+                {{ isFavorite() ? 'Added to Favorite' : 'Add to Favorite' }}
+              </span>
+            </ion-button>            
           </ion-card-content>
         </ion-card>
       </div>
@@ -35,6 +43,32 @@
         <ion-button expand="block" (click)="fetchWeather()">Get Weather</ion-button>
         <div style="text-align: center; margin-top: 10px;">Or</div>
         <ion-button expand="block" (click)="getCurrentLocation()">Use Current Location</ion-button>
+
+        <!-- Favorite Cities (Always visible) -->
+        <div class="favorite-cities">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Favorite Cities</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <!-- Show message if no cities are added -->
+              <div *ngIf="favorites.length === 0" class="no-favorites">
+                <ion-icon name="add-circle-outline" style="font-size: 32px;"></ion-icon>
+                <p>No cities added yet. Add a city to your favorites!</p>
+              </div>
+              <!-- Show list of favorite cities if there are any -->
+              <ul *ngIf="favorites.length > 0">
+                <li *ngFor="let city of favorites" style="cursor: pointer;" (click)="selectFavorite(city)">
+                  {{ city }}
+                  <!-- Remove Button -->
+                  <ion-button fill="clear" (click)="removeFromFavorites(city)" style="font-size: 16px; color: red;">
+                    Remove
+                  </ion-button>
+                </li>
+              </ul>
+            </ion-card-content>
+          </ion-card>
+        </div>
       </div>
 
     </div>
