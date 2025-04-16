@@ -1,30 +1,35 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, RouterModule],
   templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss']
+  styleUrls: ['./home.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    IonicModule
+  ]
 })
 export class HomePage implements OnInit {
   city: string = '';
   weather: any = null;
   forecast: any[] = [];
+  favorites: string[] = [];
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.city = 'Johannesburg';
+    this.loadFavorites();
     this.fetchWeather();
   }
 
-  // Function to format the current date and day
   getFormattedDate(): string {
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' };
@@ -36,7 +41,6 @@ export class HomePage implements OnInit {
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${this.city}&appid=${apiKey}&units=metric`;
     const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${this.city}&appid=${apiKey}&units=metric`;
 
-    // Current weather
     this.http.get(weatherUrl).subscribe(
       (response: any) => {
         this.weather = response;
@@ -46,20 +50,17 @@ export class HomePage implements OnInit {
       }
     );
 
-    // Forecast
     this.http.get(forecastUrl).subscribe(
       (response: any) => {
         const dailyMap: { [date: string]: any[] } = {};
         response.list.forEach((entry: any) => {
           const date = new Date(entry.dt_txt).toDateString();
-          if (!dailyMap[date]) {
-            dailyMap[date] = [];
-          }
+          if (!dailyMap[date]) dailyMap[date] = [];
           dailyMap[date].push(entry);
         });
 
         const today = new Date().toDateString();
-        const days = Object.keys(dailyMap).filter(d => d !== today).slice(0, 6);
+        const days = Object.keys(dailyMap).filter(d => d !== today).slice(0, 5);
 
         this.forecast = days.map(day => {
           const entries = dailyMap[day];
@@ -105,9 +106,10 @@ export class HomePage implements OnInit {
     this.http.get(weatherUrl).subscribe(
       (response: any) => {
         this.weather = response;
+        this.city = this.weather.name;
       },
       (error) => {
-        console.error('Error fetching weather data by coordinates', error);
+        console.error('Error fetching weather data', error);
       }
     );
 
@@ -116,14 +118,12 @@ export class HomePage implements OnInit {
         const dailyMap: { [date: string]: any[] } = {};
         response.list.forEach((entry: any) => {
           const date = new Date(entry.dt_txt).toDateString();
-          if (!dailyMap[date]) {
-            dailyMap[date] = [];
-          }
+          if (!dailyMap[date]) dailyMap[date] = [];
           dailyMap[date].push(entry);
         });
 
         const today = new Date().toDateString();
-        const days = Object.keys(dailyMap).filter(d => d !== today).slice(0, 6);
+        const days = Object.keys(dailyMap).filter(d => d !== today).slice(0, 5);
 
         this.forecast = days.map(day => {
           const entries = dailyMap[day];
@@ -139,8 +139,46 @@ export class HomePage implements OnInit {
         });
       },
       (error) => {
-        console.error('Error fetching forecast data by coordinates', error);
+        console.error('Error fetching forecast data', error);
       }
     );
+  }
+
+  toggleFavorite() {
+    if (this.isFavorite()) {
+      this.removeFromFavorites(this.city);
+    } else {
+      this.addToFavorites(this.city);
+    }
+  }
+
+  isFavorite(): boolean {
+    return this.favorites.includes(this.city);
+  }
+
+  addToFavorites(city: string) {
+    this.favorites.push(city);
+    this.saveFavorites();
+  }
+
+  removeFromFavorites(city: string) {
+    this.favorites = this.favorites.filter(fav => fav !== city);
+    this.saveFavorites();
+  }
+
+  saveFavorites() {
+    localStorage.setItem('favorites', JSON.stringify(this.favorites));
+  }
+
+  loadFavorites() {
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      this.favorites = JSON.parse(savedFavorites);
+    }
+  }
+
+  selectFavorite(city: string) {
+    this.city = city;
+    this.fetchWeather();
   }
 }
