@@ -25,10 +25,11 @@ export class HomePage implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.city = 'Johannesburg';
+    this.city = '';  
     this.loadFavorites();
-    this.fetchWeather();
+    this.fetchWeather('Johannesburg'); 
   }
+  
 
   getFormattedDate(): string {
     const now = new Date();
@@ -36,11 +37,11 @@ export class HomePage implements OnInit {
     return now.toLocaleDateString('en-GB', options);
   }
 
-  fetchWeather() {
+  fetchWeather(city: string = this.city) {
     const apiKey = 'e7f87037686596e39a1727865cd409b4';
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${this.city}&appid=${apiKey}&units=metric`;
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${this.city}&appid=${apiKey}&units=metric`;
-
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+  
     this.http.get(weatherUrl).subscribe(
       (response: any) => {
         this.weather = response;
@@ -49,7 +50,7 @@ export class HomePage implements OnInit {
         console.error('Error fetching weather data', error);
       }
     );
-
+  
     this.http.get(forecastUrl).subscribe(
       (response: any) => {
         const dailyMap: { [date: string]: any[] } = {};
@@ -58,10 +59,10 @@ export class HomePage implements OnInit {
           if (!dailyMap[date]) dailyMap[date] = [];
           dailyMap[date].push(entry);
         });
-
+  
         const today = new Date().toDateString();
         const days = Object.keys(dailyMap).filter(d => d !== today).slice(0, 5);
-
+  
         this.forecast = days.map(day => {
           const entries = dailyMap[day];
           const noonData = entries.find(e => e.dt_txt.includes("12:00:00")) || entries[0];
@@ -80,7 +81,7 @@ export class HomePage implements OnInit {
       }
     );
   }
-
+  
   getCurrentLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -145,16 +146,20 @@ export class HomePage implements OnInit {
   }
 
   toggleFavorite() {
-    if (this.isFavorite()) {
-      this.removeFromFavorites(this.city);
-    } else {
-      this.addToFavorites(this.city);
+    if (this.weather?.name) {
+      const cityName = this.weather.name;
+      if (this.isFavorite(cityName)) {
+        this.removeFromFavorites(cityName);
+      } else {
+        this.addToFavorites(cityName);
+      }
     }
   }
-
-  isFavorite(): boolean {
-    return this.favorites.includes(this.city);
+  
+  isFavorite(cityName: string = this.weather?.name): boolean {
+    return this.favorites.includes(cityName);
   }
+  
 
   addToFavorites(city: string) {
     this.favorites.push(city);
